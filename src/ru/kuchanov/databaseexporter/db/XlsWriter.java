@@ -33,7 +33,6 @@ public class XlsWriter extends AsyncTask<Void, Void, File[]>
 
 	public XlsWriter(Context ctx, Cursor c)
 	{
-		//		Log.e(LOG, "constructor");
 		this.ctx = ctx;
 		this.c = c;
 	}
@@ -41,9 +40,6 @@ public class XlsWriter extends AsyncTask<Void, Void, File[]>
 	@Override
 	protected File[] doInBackground(Void... params)
 	{
-		//		File dbFile = this.ctx.getDatabasePath(DataBaseHelper.DATABASE_NAME);
-		//		Log.v(LOG, "Db path is: " + dbFile); //get the path of db
-
 		//TODO SIZE!
 		File[] output = new File[1];
 
@@ -60,7 +56,6 @@ public class XlsWriter extends AsyncTask<Void, Void, File[]>
 	protected void onPostExecute(File[] out)
 	{
 		Log.e(LOG, "onPostExecute");
-		//		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 		Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
 		emailIntent.setType("text/html");
 		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { to });
@@ -70,13 +65,10 @@ public class XlsWriter extends AsyncTask<Void, Void, File[]>
 		ArrayList<Uri> uris = new ArrayList<Uri>();
 		for (File f : out)
 		{
-			//			emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
 			uris.add(Uri.fromFile(f));
 		}
 		emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
-		//		this.ctx.startActivityForResult(Intent.createChooser(emailIntent, "Sending multiple attachment"), 12345);
 
-		//				emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
 		this.ctx.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
 
 	}
@@ -105,7 +97,6 @@ public class XlsWriter extends AsyncTask<Void, Void, File[]>
 	{
 		try
 		{
-			//			File exportDir = new File(this.ctx.getExternalFilesDir(null), "");
 			File exportDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
 			"");
 
@@ -117,18 +108,16 @@ public class XlsWriter extends AsyncTask<Void, Void, File[]>
 			Cells cells = workbook.getWorksheets().get(0).getCells();
 
 			//get column names from DB table
-//			String[] columnNames = new String[c.getColumnCount()];
-//
-//			for (int i = 0; i < c.getColumnCount(); i++)
-//			{
-//				columnNames[i] = c.getColumnName(i);
-//				Log.e(LOG, columnNames[i]);
-//			}
 			String[] columnNames = getArticleFieldsNames();
 
 			for (int i = 0; i < columnNames.length; i++)
 			{
 				Log.e(LOG, columnNames[i]);
+			}
+			//insert column names
+			for (int i = 0; i < columnNames.length; i++)
+			{
+				cells.get(0, i).setValue(columnNames[i]);
 			}
 
 			//insert table data
@@ -136,21 +125,10 @@ public class XlsWriter extends AsyncTask<Void, Void, File[]>
 			{
 				while (!c.isAfterLast())
 				{
-					if (c.getPosition() == 0)
+					for (int i = 0; i < c.getColumnCount(); i++)
 					{
-						//insert column names
-						for (int i = 0; i < columnNames.length; i++)
-						{
-							cells.get(0, i).setValue(columnNames[i]);
-						}
-					}
-					else
-					{
-						for (int i = 0; i < c.getColumnCount(); i++)
-						{
-							String data = c.getString(c.getColumnIndex(columnNames[i]));
-							cells.get(c.getPosition(), i).setValue(data);
-						}
+						String data = c.getString(c.getColumnIndex(columnNames[i]));
+						cells.get(c.getPosition() + 1, i).setValue(data);
 					}
 					c.moveToNext();
 				}
@@ -173,7 +151,7 @@ public class XlsWriter extends AsyncTask<Void, Void, File[]>
 			return null;
 		}
 	}
-	
+
 	/**
 	 * returns String arr with names of all Table columns
 	 */
