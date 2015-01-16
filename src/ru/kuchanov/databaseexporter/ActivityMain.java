@@ -1,6 +1,6 @@
 package ru.kuchanov.databaseexporter;
 
-import db.XlsWriter;
+import ru.kuchanov.databaseexporter.db.XlsWriter;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentProviderClient;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package db;
+package ru.kuchanov.databaseexporter.db;
 
 import com.aspose.cells.Cells;
 import com.aspose.cells.Workbook;
