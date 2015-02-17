@@ -33,19 +33,16 @@ public class XlsWriterTask extends AsyncTask<Void, Void, File[]>
 
 	private Context ctx;
 
-	//	private Cursor c;
-
-	public XlsWriterTask(Context ctx)//, Cursor c)
+	public XlsWriterTask(Context ctx)
 	{
 		this.ctx = ctx;
-		//		this.c = c;
 	}
 
 	@Override
 	protected File[] doInBackground(Void... cursors)
 	{
 		//TODO SIZE!
-		File[] output = new File[2];
+		File[] output = new File[3];
 
 		//get article table and write it to xls
 		Uri articleAllURI = Uri.parse("content://ru.kuchanov.odnako.db.ContentProviderOdnakoDB/article");
@@ -66,6 +63,18 @@ public class XlsWriterTask extends AsyncTask<Void, Void, File[]>
 		{
 			Cursor artCatCursor = artCatContProvCl.query(artCatAllURI, null, null, null, null);
 			output[1] = this.getArtCatTableXLS(artCatCursor);
+		} catch (RemoteException e)
+		{
+			e.printStackTrace();
+		}
+
+		//get ArtCatTable table and write it to xls
+		Uri authorAllURI = Uri.parse("content://ru.kuchanov.odnako.db.ContentProviderOdnakoDB/author");
+		ContentProviderClient authorContProvCl = ctx.getContentResolver().acquireContentProviderClient(authorAllURI);
+		try
+		{
+			Cursor authorCursor = authorContProvCl.query(authorAllURI, null, null, null, null);
+			output[2] = this.getAuthorXLS(authorCursor);
 		} catch (RemoteException e)
 		{
 			e.printStackTrace();
@@ -226,6 +235,60 @@ public class XlsWriterTask extends AsyncTask<Void, Void, File[]>
 		}
 	}
 
+	private File getAuthorXLS(Cursor c)
+	{
+		try
+		{
+			File exportDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+			"");
+
+			String path = exportDir.getCanonicalPath();
+
+			//Instantiate a Workbook object.
+			Workbook workbook = new Workbook();
+			//Get the first worksheet's cells in the book.
+			Cells cells = workbook.getWorksheets().get(0).getCells();
+
+			//get column names from DB table
+			String[] columnNames = getAuthorFieldsNames();
+			//insert column names
+			for (int i = 0; i < columnNames.length; i++)
+			{
+				cells.get(0, i).setValue(columnNames[i]);
+			}
+
+			//insert table data
+			if (c.moveToFirst())
+			{
+				while (!c.isAfterLast())
+				{
+					for (int i = 0; i < c.getColumnCount(); i++)
+					{
+						String data = c.getString(c.getColumnIndex(columnNames[i]));
+						cells.get(c.getPosition() + 1, i).setValue(data);
+					}
+					c.moveToNext();
+				}
+			}
+
+			//Save the Excel file.
+			workbook.save(path + "/AuthorXLS.xls");
+
+			File file = new File(path + "/AuthorXLS.xls");
+
+			return file;
+
+		} catch (IOException e)
+		{
+			Log.e(LOG, e.getMessage());
+			return null;
+		} catch (Exception e)
+		{
+			Log.e(LOG, e.getMessage());
+			return null;
+		}
+	}
+
 	/**
 	 * returns String[] with names of all Article table columns
 	 */
@@ -244,6 +307,16 @@ public class XlsWriterTask extends AsyncTask<Void, Void, File[]>
 	public static String[] getArtCatTableFieldsNames()
 	{
 		String[] arrStr1 = { "id", "article_id", "category_id", "nextArtUrl", "previousArtUrl", "isTop" };
+		return arrStr1;
+	}
+
+	/**
+	 * returns String[] with names of all Author table columns
+	 */
+	public static String[] getAuthorFieldsNames()
+	{
+		String[] arrStr1 = { "id", "blog_url", "name", "description", "who", "avatar", "avatarBig", "refreshed",
+				"lastArticleDate", "firstArticleURL" };
 		return arrStr1;
 	}
 }

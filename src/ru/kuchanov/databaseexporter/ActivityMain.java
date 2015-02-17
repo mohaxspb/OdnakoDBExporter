@@ -1,14 +1,11 @@
 package ru.kuchanov.databaseexporter;
 
+
 import ru.kuchanov.databaseexporter.db.XlsWriterTask;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.ContentProviderClient;
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +17,7 @@ import android.widget.Button;
 
 public class ActivityMain extends Activity
 {
-	//tag:^(?!dalvikvm) tag:^(?!libEGL) tag:^(?!Open) tag:^(?!Google) tag:^(?!resour) tag:^(?!Chore) tag:^(?!EGL)
+	final static String TAG=ActivityMain.class.getSimpleName();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -33,6 +30,18 @@ public class ActivityMain extends Activity
 			.add(R.id.container, new PlaceholderFragment())
 			.commit();
 		}
+		
+//		Calendar calendar = Calendar.getInstance();
+//	    calendar.set(Calendar.HOUR_OF_DAY, 14);
+//	    calendar.set(Calendar.MINUTE, 0);
+//	    calendar.set(Calendar.SECOND, 0);
+//	    
+////	    Log.e(TAG, calendar.toString());
+//	    AlarmManager am = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+//	    Intent intent = new Intent(this, ActivityMain.class);
+//	    intent.setAction("notifyEveryDay");
+//	    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//	    am.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis() ,AlarmManager.INTERVAL_DAY, pendingIntent);
 	}
 
 	@Override
